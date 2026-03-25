@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madara_link - WhatsApp Auto-Response</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Madara_link</h1>
+        <p>Manage your WhatsApp auto-responses</p>
+        <div id="auth-section">
+            <button id="register-btn">Register</button>
+            <button id="login-btn">Login</button>
+        </div>
+        <div id="register-form" style="display: none;">
+            <h2>Register</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <input type="text" id="username" placeholder="Username">
+            <button id="send-code">Send Code</button>
+            <input type="text" id="code" placeholder="Confirmation Code">
+            <button id="register-submit">Register</button>
+        </div>
+        <div id="login-form" style="display: none;">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button id="login-submit">Login</button>
+        </div>
+        <div id="dashboard" style="display: none;">
+            <h2>Dashboard</h2>
+            <button id="link-whatsapp">Link WhatsApp</button>
+            <div id="whatsapp-links"></div>
+            <h3>Add Auto-Response</h3>
+            <textarea id="auto-response" placeholder="Enter auto-response message"></textarea>
+            <button id="save-response">Save Response</button>
+            <div id="linked-accounts"></div>
+        </div>
+    </div>
+
+    <script>
+        // Basic frontend logic
+        const registerBtn = document.getElementById('register-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const registerForm = document.getElementById('register-form');
+        const loginForm = document.getElementById('login-form');
+        const dashboard = document.getElementById('dashboard');
+
+        registerBtn.addEventListener('click', () => {
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        loginBtn.addEventListener('click', () => {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        // Assume backend API endpoints are set up
+        document.getElementById('register-submit').addEventListener('click', async () => {
+            // Call backend to register user
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                    username: document.getElementById('username').value,
+                    code: document.getElementById('code').value
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                dashboard.style.display = 'block';
+                registerForm.style.display = 'none';
+            }
+        });
+
+        document.getElementById('login-submit').addEventListener('click', async () => {
+            // Call backend to login user
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: document.getElementById('login-email').value,
+                    password: document.getElementById('login-password').value
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                dashboard.style.display = 'block';
+                loginForm.style.display = 'none';
+            }
+        });
+
+        document.getElementById('link-whatsapp').addEventListener('click', async () => {
+            // Call backend to link WhatsApp account
+            const response = await fetch('/api/link-whatsapp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: prompt('Enter your WhatsApp number')
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                const linkedAccounts = document.getElementById('linked-accounts');
+                linkedAccounts.innerHTML += `<p>${data.phone} - Linked</p>`;
+            }
+        });
+
+        document.getElementById('save-response').addEventListener('click', async () => {
+            // Call backend to save auto-response
+            const response = await fetch('/api/save-response', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    response: document.getElementById('auto-response').value
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Auto-response saved!');
+            }
+        });
+    </script>
+</body>
+</html>
